@@ -3,6 +3,7 @@
 public class Game {
     int x;
     int y;
+
     public void  setup() {
         x = 5;
         y = 10;
