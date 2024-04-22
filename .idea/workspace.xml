@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b800ff43-d091-471d-a62a-141aebff4905" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/src/RunLocalTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LastProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/LastProject.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Card.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Gamer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gamer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Player.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Trick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Trick.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,7 +110,7 @@
       <option name="presentableId" value="Default" />
       <updated>1713220879215</updated>
       <workItem from="1713220880325" duration="10000000" />
-      <workItem from="1713560843595" duration="59154000" />
+      <workItem from="1713560843595" duration="60777000" />
     </task>
     <task id="LOCAL-00001" summary="Changes">
       <option name="closed" value="true" />
@@ -124,7 +120,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713757361866</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Changes">
+      <option name="closed" value="true" />
+      <created>1713812324629</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1713812324629</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -144,7 +148,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Gamer.java</url>
-          <line>537</line>
+          <line>582</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">

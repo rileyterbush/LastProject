@@ -28,6 +28,7 @@ public class Gamer implements Runnable {
 //    Gamer gamer;
     private int teamAScore;
     private int teamBScore;
+    private int cardsPlayed;
     private String trump;
     private ArrayList<Card> trumpCards;
     private Card right;
@@ -73,6 +74,7 @@ public class Gamer implements Runnable {
 
 
     public void run() {
+        cardsPlayed = 0;
         playerIndex = 0;
         final int MINIMUM = 600;
         JFrame frame = new JFrame();
@@ -195,6 +197,7 @@ public class Gamer implements Runnable {
                 cardOne.setVisible(true);
                 trick.addTrickCard(card1);
                 card1.setPlayed(true);
+                cardsPlayed++;
                 if (playerIndex < 3) {
                     playerIndex++;
                 } else {
@@ -226,6 +229,14 @@ public class Gamer implements Runnable {
                         teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
                         teamBScoreLabel.revalidate();
                         teamBScoreLabel.repaint();
+                    }
+
+                    if (cardsPlayed == 5) {
+                        if (teamBScore > teamAScore) {
+                            JOptionPane.showMessageDialog(null, "The winner is Team B. Thank you for playing!");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "The winner is Team A. Thank you for playing!");
+                        }
                     }
 
                     trick.reorderPlayers(winningPlayer.getPosition(), players);
@@ -265,6 +276,7 @@ public class Gamer implements Runnable {
                 cardTwo.setVisible(true);
                 trick.addTrickCard(card2);
                 card2.setPlayed(true);
+                cardsPlayed++;
                 if (playerIndex < 3) {
                     playerIndex++;
                 } else {
@@ -295,6 +307,14 @@ public class Gamer implements Runnable {
                         teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
                         teamBScoreLabel.revalidate();
                         teamBScoreLabel.repaint();
+                    }
+
+                    if (cardsPlayed == 5) {
+                        if (teamBScore > teamAScore) {
+                            JOptionPane.showMessageDialog(null, "The winner is Team B. Thank you for playing!");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "The winner is Team A. Thank you for playing!");
+                        }
                     }
 
                     trick.reorderPlayers(winningPlayer.getOrder(), players);
@@ -335,6 +355,7 @@ public class Gamer implements Runnable {
                 cardThree.setVisible(true);
                 trick.addTrickCard(card3);
                 card3.setPlayed(true);
+                cardsPlayed++;
                 if (playerIndex < 3) {
                     playerIndex++;
                 } else {
@@ -365,6 +386,14 @@ public class Gamer implements Runnable {
                         teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
                         teamBScoreLabel.revalidate();
                         teamBScoreLabel.repaint();
+                    }
+
+                    if (cardsPlayed == 5) {
+                        if (teamBScore > teamAScore) {
+                            JOptionPane.showMessageDialog(null, "The winner is Team B. Thank you for playing!");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "The winner is Team A. Thank you for playing!");
+                        }
                     }
 
                     trick.reorderPlayers(winningPlayer.getOrder(), players);
@@ -404,6 +433,7 @@ public class Gamer implements Runnable {
                 cardFour.setVisible(true);
                 trick.addTrickCard(card4);
                 card4.setPlayed(true);
+                cardsPlayed++;
                 if (playerIndex < 3) {
                     playerIndex++;
                 } else {
@@ -434,6 +464,14 @@ public class Gamer implements Runnable {
                         teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
                         teamBScoreLabel.revalidate();
                         teamBScoreLabel.repaint();
+                    }
+
+                    if (cardsPlayed == 5) {
+                        if (teamBScore > teamAScore) {
+                            JOptionPane.showMessageDialog(null, "The winner is Team B. Thank you for playing!");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "The winner is Team A. Thank you for playing!");
+                        }
                     }
 
                     trick.reorderPlayers(winningPlayer.getOrder(), players);
@@ -474,6 +512,7 @@ public class Gamer implements Runnable {
                 cardFive.setVisible(true);
                 trick.addTrickCard(card5);
                 card5.setPlayed(true);
+                cardsPlayed++;
                 if (playerIndex < 3) {
                     playerIndex++;
                 } else {
@@ -505,7 +544,13 @@ public class Gamer implements Runnable {
                         teamBScoreLabel.revalidate();
                         teamBScoreLabel.repaint();
                     }
-
+                    if (cardsPlayed == 5) {
+                        if (teamBScore > teamAScore) {
+                            JOptionPane.showMessageDialog(null, "The winner is Team B. Thank you for playing!");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "The winner is Team A. Thank you for playing!");
+                        }
+                    }
                     trick.reorderPlayers(winningPlayer.getOrder(), players);
                     for (Player player : players) {
                         System.out.println(player.getOrder());
@@ -544,9 +589,14 @@ public class Gamer implements Runnable {
                         playableCards.add(card);
                     }
                 }
+                Card play;
                 Random rand = new Random();
-                int r = rand.nextInt(playableCards.size());
-                Card play = playableCards.get(r);
+                if (playableCards.isEmpty()) {
+                    play = players[playerIndex].getHand()[0];
+                } else {
+                    int r = rand.nextInt(playableCards.size());
+                    play = playableCards.get(r);
+                }
                 play.setPlayed(true);
                 JButton playedCard = null;
                 try {

@@ -169,10 +169,10 @@ public class Trick {
                 break;
             case 3:
                 Player temp4 = players[3];
-                players[1] = players[0];
-                players[2] = players[1];
                 players[3] = players[2];
-                players[3] = temp4;
+                players[2] = players[1];
+                players[1] = players[0];
+                players[0] = temp4;
                 for (int i = 0; i < 4; i++) {
                     players[i].setPosition(i);
                 }
