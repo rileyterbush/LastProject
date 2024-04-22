@@ -8,7 +8,20 @@ import java.io.IOException;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Random;
+
+/**
+ * A class that initializes the euchre game
+ * and lays out the cards used to play into
+ * a complex GUI.
+ *
+ * <p>Purdue University -- CS18000 -- Spring 2024</p>
+ *
+ * @author Riley TerBush
+ * @version April 22, 2024
+ */
 
 
 public class Gamer implements Runnable {
@@ -19,32 +32,40 @@ public class Gamer implements Runnable {
     private ArrayList<Card> trumpCards;
     private Card right;
     private Card left;
-//    private Card[] trick;
+    private int playerIndex;
 
-    private Trick trick;
-    private static Player[] players = { new Player("A", 0, null), new Player("B", 1, null),
-            new Player("A", 2, null), new Player("B", 3, null) };
+    private Trick trick = new Trick(null, null, null, null, new ArrayList<Card>());
+    private static Player[] players = { new Player("A", 0, null, 0), new Player("B", 1, null, 1),
+            new Player("A", 2, null, 2), new Player("B", 3, null, 3) };
     private Card card1, card2, card3, card4, card5;
-//    private Card[] hand = { new Card("spade", "ace", 1, "ace_of_spades.jpeg"), new Card("club", "ace", 2, "ace_of_clubs.jpeg"),
-//            new Card("heart", "ace", 3, "ace_of_hearts.jpeg"), new Card("diamond", "ace", 4, "ace_of_diamonds.jpeg"),
-//            new Card("spade", "king", 5, "king_of_spades.jpeg") };
-    private Card[] cards = { new Card("spade", "ace", 1, "ace_of_spades.jpeg", false), new Card("club", "ace", 2, "ace_of_clubs.jpeg", false),
-        new Card("heart", "ace", 3, "ace_of_hearts.jpeg", false), new Card("diamond", "ace", 4, "ace_of_diamonds.jpeg", false),
-        new Card("spade", "king", 5, "king_of_spades.jpeg", false), new Card("club", "king", 6, "king_of_clubs.jpeg", false),
-        new Card("heart", "king", 7, "king_of_hearts.jpeg", false), new Card("diamond", "king", 8, "king_of_diamonds.jpeg", false),
-        new Card("spade", "queen", 9, "queen_of_spades.jpeg", false), new Card("club", "queen", 10, "queen_of_clubs.jpeg", false),
-        new Card("heart", "queen", 11, "queen_of_hearts.jpeg", false), new Card("diamond", "queen", 12, "queen_of_diamonds.jpeg", false),
-        new Card("spade", "jack", 13, "jack_of_spades.jpeg", false), new Card("club", "jack", 14, "jack_of_clubs.jpeg", false),
-        new Card("heart", "jack", 15, "jack_of_hearts.jpeg", false), new Card("diamond", "jack", 16, "jack_of_diamonds.jpeg", false),
-        new Card("spade", "10", 17, "ten_of_spades.jpeg", false), new Card("club", "10", 18, "ten_of_clubs.jpeg", false),
-        new Card("heart", "10", 19, "ten_of_hearts.jpeg", false), new Card("diamond", "10", 20, "ten_of_diamonds.jpeg", false),
-        new Card("spade", "9", 21, "nine_of_spades.jpeg", false), new Card("club", "9", 22, "nine_of_clubs.jpeg", false),
-        new Card("heart", "9", 23, "nine_of_hearts.jpeg", false), new Card("diamond", "9", 24, "nine_of_diamonds.jpeg", false)};
+
+    private static Card[] cards = { new Card("spade", "ace", 1, "ace_of_spades.jpeg", false, null), new Card("club", "ace", 2, "ace_of_clubs.jpeg", false, null),
+        new Card("heart", "ace", 3, "ace_of_hearts.jpeg", false, null), new Card("diamond", "ace", 4, "ace_of_diamonds.jpeg", false, null),
+        new Card("spade", "king", 5, "king_of_spades.jpeg", false, null), new Card("club", "king", 6, "king_of_clubs.jpeg", false, null),
+        new Card("heart", "king", 7, "king_of_hearts.jpeg", false, null), new Card("diamond", "king", 8, "king_of_diamonds.jpeg", false, null),
+        new Card("spade", "queen", 9, "queen_of_spades.jpeg", false, null), new Card("club", "queen", 10, "queen_of_clubs.jpeg", false, null),
+        new Card("heart", "queen", 11, "queen_of_hearts.jpeg", false, null), new Card("diamond", "queen", 12, "queen_of_diamonds.jpeg", false, null),
+        new Card("spade", "jack", 13, "jack_of_spades.jpeg", false, null), new Card("club", "jack", 14, "jack_of_clubs.jpeg", false, null),
+        new Card("heart", "jack", 15, "jack_of_hearts.jpeg", false, null), new Card("diamond", "jack", 16, "jack_of_diamonds.jpeg", false, null),
+        new Card("spade", "10", 17, "ten_of_spades.jpeg", false, null), new Card("club", "10", 18, "ten_of_clubs.jpeg", false, null),
+        new Card("heart", "10", 19, "ten_of_hearts.jpeg", false, null), new Card("diamond", "10", 20, "ten_of_diamonds.jpeg", false, null),
+        new Card("spade", "9", 21, "nine_of_spades.jpeg", false, null), new Card("club", "9", 22, "nine_of_clubs.jpeg", false, null),
+        new Card("heart", "9", 23, "nine_of_hearts.jpeg", false, null), new Card("diamond", "9", 24, "nine_of_diamonds.jpeg", false, null)};
 
     JButton startGameButton;
-//    Container content;
-//    JPanel panelWelcome;
-//    JPanel panel;
+    JButton botPlayButton;
+
+
+    // These are the fields for the card in the human user's hand which are displayed across
+    // the bottom of the screen
+    JButton cardOne;
+    JButton cardTwo;
+    JButton cardThree;
+    JButton cardFour;
+    JButton cardFive;
+    JLabel teamAScoreLabel;
+    JLabel teamBScoreLabel;
+
 
 
     public Gamer() {
@@ -52,7 +73,7 @@ public class Gamer implements Runnable {
 
 
     public void run() {
-
+        playerIndex = 0;
         final int MINIMUM = 600;
         JFrame frame = new JFrame();
         frame.setTitle("Euchre");
@@ -64,278 +85,573 @@ public class Gamer implements Runnable {
         content.setLayout(new BorderLayout());
         Game game = new Game();
 
-//        frame.addMouseListener(game);
 
-//        new Timer(1000, game).start();
+        teamAScore = 0;
+        teamBScore = 0;
 
         JPanel panelWelcome = new JPanel();
         startGameButton = new JButton("Start the euchre game!");
         panelWelcome.add(startGameButton);
         content.add(panelWelcome);
+        panelWelcome.setVisible(true);
 
 
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout());
-//        BufferedImage myPicture = null;
-//        BufferedImage myPicture2 = null;
-//        BufferedImage myPicture3 = null;
-//        BufferedImage myPicture4 = null;
-//        BufferedImage myPicture5 = null;
-//        try {
-//            myPicture = ImageIO.read(new File("ace_of_spades.jpeg"));
-//            myPicture2 = ImageIO.read(new File("ace_of_hearts.jpeg"));
-//            myPicture3 = ImageIO.read(new File("ace_of_clubs.jpeg"));
-//            myPicture4 = ImageIO.read(new File("ace_of_diamonds.jpeg"));
-//            myPicture5 = ImageIO.read(new File("jack_of_spades.jpeg"));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        JButton cardOne;
-        JButton cardTwo;
-        JButton cardThree;
-        JButton cardFour;
-        JButton cardFive;
+
 
         boolean first = true;
 
         JPanel informationBar = new JPanel();
         JLabel trumpLabel;
-        informationBar.setVisible(false);
+        teamAScoreLabel = new JLabel("Team A: " + teamAScore);
+        teamBScoreLabel = new JLabel("Team B: " + teamBScore);
+        botPlayButton = new JButton("Get next play");
+        informationBar.add(botPlayButton);
+        informationBar.add(teamAScoreLabel);
+        informationBar.add(teamBScoreLabel);
+        content.add(informationBar);
+        informationBar.setVisible(true);
+
+        if (players[playerIndex].getOrder() == 0) {
+            botPlayButton.setEnabled(false);
+        } else {
+            botPlayButton.setEnabled(true);
+        }
+
+        Card card = new Card();
+
 
         startGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-//                content.remove(panelWelcome);
-//                content.add(panel);
                 panelWelcome.setVisible(false);
                 panel.setVisible(true);
                 informationBar.setVisible(true);
             }
         });
 
-
-//        content.add(informationBar, BorderLayout.NORTH);
-
-
-//        do {
-            Card card = new Card();
-//            card.shuffle(cards, 24);
-//            card.deal(players, cards);
-//            trump = card.getKitty()[0].getSuit();
-//            trumpLabel = new JLabel(trump + "s is trump");
-//            informationBar.add(trumpLabel);
-//            content.add(informationBar, BorderLayout.NORTH);
-//
-//
-//            card1 = players[0].getHand()[0];
-//            card2 = players[0].getHand()[1];
-//            card3 = players[0].getHand()[2];
-//            card4 = players[0].getHand()[3];
-//            card5 = players[0].getHand()[4];
-//
-//
-//            try {
-//                cardOne = new JButton(new ImageIcon(ImageIO.read(new File(card1.getImgTag()))));
-//                cardTwo = new JButton(new ImageIcon(ImageIO.read(new File(card2.getImgTag()))));
-//                cardThree = new JButton(new ImageIcon(ImageIO.read(new File(card3.getImgTag()))));
-//                cardFour = new JButton(new ImageIcon(ImageIO.read(new File(card4.getImgTag()))));
-//                cardFive = new JButton(new ImageIcon(ImageIO.read(new File(card5.getImgTag()))));
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//
-////        panel.add(myPicture);
-//            panel.add(cardOne);
-//            panel.add(cardTwo);
-//            panel.add(cardThree);
-//            panel.add(cardFour);
-//            panel.add(cardFive);
-//            content.add(panel, BorderLayout.PAGE_END);
-//            if (first) {
-//                panel.setVisible(false);
-//            }
-////        } while (teamAScore < 10 || teamBScore < 10);
-//
-//
-//
+        Gamer gamer = new Gamer();
+        card.shuffle(cards, 24);
+        card.deal(players, cards);
+        trump = card.getKitty()[0].getSuit();
+        trumpLabel = new JLabel(trump + "s is trump");
 
 
-//        do {
-//            Trick trick1 = new Trick(null, 23, null);
-//            trick1.reorderPlayers(1);
-//        } while ()
-
-        // The game:
-//        for (int i = 0; i < 10; i++) {
-//        public void deal() {
-//
-//        }
-            Gamer gamer = new Gamer();
-            card.shuffle(cards, 24);
-            card.deal(players, cards);
-            trump = card.getKitty()[0].getSuit();
-            trumpLabel = new JLabel(trump + "s is trump");
-//            System.out.println(trump);
-
-            card1 = players[0].getHand()[0];
-            card2 = players[0].getHand()[1];
-            card3 = players[0].getHand()[2];
-            card4 = players[0].getHand()[3];
-            card5 = players[0].getHand()[4];
-            if (first) {
-                try {
-                    cardOne = new JButton(new ImageIcon(ImageIO.read(new File(card1.getImgTag()))));
-                    cardTwo = new JButton(new ImageIcon(ImageIO.read(new File(card2.getImgTag()))));
-                    cardThree = new JButton(new ImageIcon(ImageIO.read(new File(card3.getImgTag()))));
-                    cardFour = new JButton(new ImageIcon(ImageIO.read(new File(card4.getImgTag()))));
-                    cardFive = new JButton(new ImageIcon(ImageIO.read(new File(card5.getImgTag()))));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                panel.add(cardOne);
-                panel.add(cardTwo);
-                panel.add(cardThree);
-                panel.add(cardFour);
-                panel.add(cardFive);
-                frame.add(panel, BorderLayout.SOUTH);
-                frame.repaint();
-//                content.add(panel, BorderLayout.SOUTH);
-
-                informationBar.add(trumpLabel);
-                content.add(informationBar, BorderLayout.NORTH);
-//                String[] options = {}
-//                int cardPlayed = JOptionPane.showInputDialog()
-//            }
-
-            if (first) {
-                panel.setVisible(true);
-            }
-            first = false;
-
-            JPanel trickPanel = new JPanel();
-            trickPanel.setLayout(new GridLayout());
-            trickPanel.setVisible(true);
-            content.add(trickPanel, BorderLayout.CENTER);
-
-                cardOne.addActionListener(new ActionListener() {
-
-                    public void actionPerformed(ActionEvent e) {
-//                        if (card1.)
-                        cardOne.setVisible(false);
-                        trickPanel.add(cardOne);
-                        trickPanel.repaint();
-                        cardOne.setVisible(true);
-                        trick.addTrickCard(card1);
-
-
-                    }
-                });
-
-                cardTwo.addActionListener(new ActionListener() {
-
-                    public void actionPerformed(ActionEvent e) {
-                        cardTwo.setVisible(false);
-                        trickPanel.add(cardTwo);
-                        trickPanel.repaint();
-                        cardTwo.setVisible(true);
-                        trick.addTrickCard(card2);
-
-                    }
-                });
-
-                cardThree.addActionListener(new ActionListener() {
-
-                    public void actionPerformed(ActionEvent e) {
-                        cardThree.setVisible(false);
-                        trickPanel.add(cardThree);
-                        trickPanel.repaint();
-                        cardThree.setVisible(true);
-                        trick.addTrickCard(card3);
-
-                    }
-                });
-
-                cardFour.addActionListener(new ActionListener() {
-
-                    public void actionPerformed(ActionEvent e) {
-                        cardFour.setVisible(false);
-                        trickPanel.add(cardFour);
-                        trickPanel.repaint();
-                        cardFour.setVisible(true);
-                        trick.addTrickCard(card4);
-
-                    }
-                });
-
-                cardFive.addActionListener(new ActionListener() {
-
-                    public void actionPerformed(ActionEvent e) {
-                        cardFive.setVisible(false);
-                        trickPanel.add(cardFive);
-                        trickPanel.repaint();
-                        cardFive.setVisible(true);
-                        trick.addTrickCard(card5);
-
-                    }
-                });
-
-
-//            for (int j = 0; j < 5; j++) {
-//                Trick trick = new Trick(null, null, null, players, null);
-//                trick.reorderPlayers(1);
-//
-//                for (Player player : players) {
-//                    Card play = null;
-//                    if (player.getOrder() == 1) {
-//
-//                    } else {
-//                        Card[] cards = player.getHand();
-//                        card.botPlay(cards, trick.getHighestCardPlayed());
-//                        if (trick.getFirstCardPlayed() == null) {
-//                            if (player.hasRight()) {
-//                                trick.addTrickCard()
-//                            }
-////                            if (player.followSuit()) {
-////
-////                            }
-//                        } else {
-////                            trick.addTrickCard(card.botPlay(cards, trick.getHighestCardPlayed()));
-//                            Card cardPlay = gamer.botPlay(cards, trick.getHighestCardPlayed());
-//                            try {
-//                                trickPanel.add(new JLabel(new ImageIcon(ImageIO.read(new File(card5.getImgTag())))));
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-
-
+        card1 = players[0].getHand()[0];
+        card2 = players[0].getHand()[1];
+        card3 = players[0].getHand()[2];
+        card4 = players[0].getHand()[3];
+        card5 = players[0].getHand()[4];
+//        if (first) {
+        try {
+            cardOne = new JButton(new ImageIcon(ImageIO.read(new File(card1.getImgTag()))));
+            cardTwo = new JButton(new ImageIcon(ImageIO.read(new File(card2.getImgTag()))));
+            cardThree = new JButton(new ImageIcon(ImageIO.read(new File(card3.getImgTag()))));
+            cardFour = new JButton(new ImageIcon(ImageIO.read(new File(card4.getImgTag()))));
+            cardFive = new JButton(new ImageIcon(ImageIO.read(new File(card5.getImgTag()))));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
+        panel.add(cardOne);
+        panel.add(cardTwo);
+        panel.add(cardThree);
+        panel.add(cardFour);
+        panel.add(cardFive);
+        frame.add(panel, BorderLayout.SOUTH);
+        frame.repaint();
+//        }
+
+        informationBar.add(trumpLabel);
+        content.add(informationBar, BorderLayout.NORTH);
+
+        if (first) {
+            panel.setVisible(true);
+        }
+        first = false;
+
+        JPanel trickPanel = new JPanel();
+        trickPanel.setLayout(new GridLayout());
+        trickPanel.setVisible(true);
+        content.add(trickPanel, BorderLayout.CENTER);
+
+        if (players[playerIndex].getOrder() != 0) {
+            cardOne.setEnabled(false);
+            cardTwo.setEnabled(false);
+            cardThree.setEnabled(false);
+            cardFour.setEnabled(false);
+            cardFive.setEnabled(false);
+        }
+
+
+
+        cardOne.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardOne.setVisible(false);
+                trickPanel.add(cardOne);
+                trickPanel.repaint();
+                cardOne.setVisible(true);
+                trick.addTrickCard(card1);
+                card1.setPlayed(true);
+                if (playerIndex < 3) {
+                    playerIndex++;
+                } else {
+                    playerIndex = 0;
+                }
+
+                cardOne.setEnabled(false);
+                cardTwo.setEnabled(false);
+                cardThree.setEnabled(false);
+                cardFour.setEnabled(false);
+                cardFive.setEnabled(false);
+                botPlayButton.setEnabled(true);
+                if (trick.getTrickCards().size() == 4) {
+                    for (Card card : trick.getTrickCards()) {
+                        System.out.println(card.toString());
+                    }
+                    Card winningCard = trick.getHighestCardPlayed(trump);
+                    Player winningPlayer = winningCard.getPlayer();
+                    String winningTeam = winningPlayer.getTeam();
+                    JOptionPane.showMessageDialog(null, "The winner is " + winningTeam + " with "
+                            + winningCard.toString() + " played by Player" + winningPlayer.getOrder());
+                    if (winningTeam.equals("A")) {
+                        teamAScore++;
+                        teamAScoreLabel = new JLabel("Team A Score: " + teamAScore);
+                        teamAScoreLabel.revalidate();
+                        teamAScoreLabel.repaint();
+                    } else {
+                        teamBScore++;
+                        teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
+                        teamBScoreLabel.revalidate();
+                        teamBScoreLabel.repaint();
+                    }
+
+                    trick.reorderPlayers(winningPlayer.getPosition(), players);
+                    for (Player player : players) {
+                        System.out.println(player.getOrder());
+                    }
+                    trick.setTrickCards(new ArrayList<Card>());
+                    trickPanel.removeAll();
+                    trickPanel.revalidate();
+                    trickPanel.repaint();
+
+                    if (players[0].getOrder() == 0) {
+                        cardOne.setEnabled(true);
+                        cardTwo.setEnabled(true);
+                        cardThree.setEnabled(true);
+                        cardFour.setEnabled(true);
+                        cardFive.setEnabled(true);
+                        botPlayButton.setEnabled(false);
+                    } else {
+                        cardOne.setEnabled(false);
+                        cardTwo.setEnabled(false);
+                        cardThree.setEnabled(false);
+                        cardFour.setEnabled(false);
+                        cardFive.setEnabled(false);
+                        botPlayButton.setEnabled(true);
+                    }
+                }
+            }
+        });
+
+        cardTwo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardTwo.setVisible(false);
+                trickPanel.add(cardTwo);
+                trickPanel.repaint();
+                cardTwo.setVisible(true);
+                trick.addTrickCard(card2);
+                card2.setPlayed(true);
+                if (playerIndex < 3) {
+                    playerIndex++;
+                } else {
+                    playerIndex = 0;
+                }
+                cardOne.setEnabled(false);
+                cardTwo.setEnabled(false);
+                cardThree.setEnabled(false);
+                cardFour.setEnabled(false);
+                cardFive.setEnabled(false);
+                botPlayButton.setEnabled(true);
+                if (trick.getTrickCards().size() == 4) {
+                    for (Card card : trick.getTrickCards()) {
+                        System.out.println(card.toString());
+                    }
+                    Card winningCard = trick.getHighestCardPlayed(trump);
+                    Player winningPlayer = winningCard.getPlayer();
+                    String winningTeam = winningPlayer.getTeam();
+                    JOptionPane.showMessageDialog(null, "The winner is " + winningTeam + " with "
+                            + winningCard.toString() + " played by Player" + winningPlayer.getOrder());
+                    if (winningTeam.equals("A")) {
+                        teamAScore++;
+                        teamAScoreLabel = new JLabel("Team A Score: " + teamAScore);
+                        teamAScoreLabel.revalidate();
+                        teamAScoreLabel.repaint();
+                    } else {
+                        teamBScore++;
+                        teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
+                        teamBScoreLabel.revalidate();
+                        teamBScoreLabel.repaint();
+                    }
+
+                    trick.reorderPlayers(winningPlayer.getOrder(), players);
+                    for (Player player : players) {
+                        System.out.println(player.getOrder());
+                    }
+                    trick.setTrickCards(new ArrayList<Card>());
+                    trickPanel.removeAll();
+                    trickPanel.revalidate();
+                    trickPanel.repaint();
+
+                    if (players[0].getOrder() == 0) {
+                        cardOne.setEnabled(true);
+                        cardTwo.setEnabled(true);
+                        cardThree.setEnabled(true);
+                        cardFour.setEnabled(true);
+                        cardFive.setEnabled(true);
+                        botPlayButton.setEnabled(false);
+                    } else {
+                        cardOne.setEnabled(false);
+                        cardTwo.setEnabled(false);
+                        cardThree.setEnabled(false);
+                        cardFour.setEnabled(false);
+                        cardFive.setEnabled(false);
+                        botPlayButton.setEnabled(true);
+                    }
+                }
+
+            }
+        });
+
+        cardThree.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardThree.setVisible(false);
+                trickPanel.add(cardThree);
+                trickPanel.repaint();
+                cardThree.setVisible(true);
+                trick.addTrickCard(card3);
+                card3.setPlayed(true);
+                if (playerIndex < 3) {
+                    playerIndex++;
+                } else {
+                    playerIndex = 0;
+                }
+                cardOne.setEnabled(false);
+                cardTwo.setEnabled(false);
+                cardThree.setEnabled(false);
+                cardFour.setEnabled(false);
+                cardFive.setEnabled(false);
+                botPlayButton.setEnabled(true);
+                if (trick.getTrickCards().size() == 4) {
+                    for (Card card : trick.getTrickCards()) {
+                        System.out.println(card.toString());
+                    }
+                    Card winningCard = trick.getHighestCardPlayed(trump);
+                    Player winningPlayer = winningCard.getPlayer();
+                    String winningTeam = winningPlayer.getTeam();
+                    JOptionPane.showMessageDialog(null, "The winner is " + winningTeam + " with "
+                            + winningCard.toString() + " played by Player" + winningPlayer.getOrder());
+                    if (winningTeam.equals("A")) {
+                        teamAScore++;
+                        teamAScoreLabel = new JLabel("Team A Score: " + teamAScore);
+                        teamAScoreLabel.revalidate();
+                        teamAScoreLabel.repaint();
+                    } else {
+                        teamBScore++;
+                        teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
+                        teamBScoreLabel.revalidate();
+                        teamBScoreLabel.repaint();
+                    }
+
+                    trick.reorderPlayers(winningPlayer.getOrder(), players);
+                    for (Player player : players) {
+                        System.out.println(player.getOrder());
+                    }
+                    trick.setTrickCards(new ArrayList<Card>());
+                    trickPanel.removeAll();
+                    trickPanel.revalidate();
+                    trickPanel.repaint();
+
+                    if (players[0].getOrder() == 0) {
+                        cardOne.setEnabled(true);
+                        cardTwo.setEnabled(true);
+                        cardThree.setEnabled(true);
+                        cardFour.setEnabled(true);
+                        cardFive.setEnabled(true);
+                        botPlayButton.setEnabled(false);
+                    } else {
+                        cardOne.setEnabled(false);
+                        cardTwo.setEnabled(false);
+                        cardThree.setEnabled(false);
+                        cardFour.setEnabled(false);
+                        cardFive.setEnabled(false);
+                        botPlayButton.setEnabled(true);
+                    }
+                }
+            }
+        });
+
+        cardFour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardFour.setVisible(false);
+                trickPanel.add(cardFour);
+                trickPanel.repaint();
+                cardFour.setVisible(true);
+                trick.addTrickCard(card4);
+                card4.setPlayed(true);
+                if (playerIndex < 3) {
+                    playerIndex++;
+                } else {
+                    playerIndex = 0;
+                }
+                cardOne.setEnabled(false);
+                cardTwo.setEnabled(false);
+                cardThree.setEnabled(false);
+                cardFour.setEnabled(false);
+                cardFive.setEnabled(false);
+                botPlayButton.setEnabled(true);
+                if (trick.getTrickCards().size() == 4) {
+                    for (Card card : trick.getTrickCards()) {
+                        System.out.println(card.toString());
+                    }
+                    Card winningCard = trick.getHighestCardPlayed(trump);
+                    Player winningPlayer = winningCard.getPlayer();
+                    String winningTeam = winningPlayer.getTeam();
+                    JOptionPane.showMessageDialog(null, "The winner is " + winningTeam + " with "
+                            + winningCard.toString() + " played by Player" + winningPlayer.getOrder());
+                    if (winningTeam.equals("A")) {
+                        teamAScore++;
+                        teamAScoreLabel = new JLabel("Team A Score: " + teamAScore);
+                        teamAScoreLabel.revalidate();
+                        teamAScoreLabel.repaint();
+                    } else {
+                        teamBScore++;
+                        teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
+                        teamBScoreLabel.revalidate();
+                        teamBScoreLabel.repaint();
+                    }
+
+                    trick.reorderPlayers(winningPlayer.getOrder(), players);
+                    for (Player player : players) {
+                        System.out.println(player.getOrder());
+                    }
+                    trick.setTrickCards(new ArrayList<Card>());
+                    trickPanel.removeAll();
+                    trickPanel.revalidate();
+                    trickPanel.repaint();
+
+                    if (players[0].getOrder() == 0) {
+                        cardOne.setEnabled(true);
+                        cardTwo.setEnabled(true);
+                        cardThree.setEnabled(true);
+                        cardFour.setEnabled(true);
+                        cardFive.setEnabled(true);
+                        botPlayButton.setEnabled(false);
+                    } else {
+                        cardOne.setEnabled(false);
+                        cardTwo.setEnabled(false);
+                        cardThree.setEnabled(false);
+                        cardFour.setEnabled(false);
+                        cardFive.setEnabled(false);
+                        botPlayButton.setEnabled(true);
+                    }
+                }
+
+            }
+        });
+
+        cardFive.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardFive.setVisible(false);
+                trickPanel.add(cardFive);
+                trickPanel.repaint();
+                cardFive.setVisible(true);
+                trick.addTrickCard(card5);
+                card5.setPlayed(true);
+                if (playerIndex < 3) {
+                    playerIndex++;
+                } else {
+                    playerIndex = 0;
+                }
+                cardOne.setEnabled(false);
+                cardTwo.setEnabled(false);
+                cardThree.setEnabled(false);
+                cardFour.setEnabled(false);
+                cardFive.setEnabled(false);
+                botPlayButton.setEnabled(true);
+                if (trick.getTrickCards().size() == 4) {
+                    for (Card card : trick.getTrickCards()) {
+                        System.out.println(card.toString());
+                    }
+                    Card winningCard = trick.getHighestCardPlayed(trump);
+                    Player winningPlayer = winningCard.getPlayer();
+                    String winningTeam = winningPlayer.getTeam();
+                    JOptionPane.showMessageDialog(null, "The winner is " + winningTeam + " with "
+                            + winningCard.toString() + " played by Player" + winningPlayer.getOrder());
+                    if (winningTeam.equals("A")) {
+                        teamAScore++;
+                        teamAScoreLabel = new JLabel("Team A Score: " + teamAScore);
+                        teamAScoreLabel.revalidate();
+                        teamAScoreLabel.repaint();
+                    } else {
+                        teamBScore++;
+                        teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
+                        teamBScoreLabel.revalidate();
+                        teamBScoreLabel.repaint();
+                    }
+
+                    trick.reorderPlayers(winningPlayer.getOrder(), players);
+                    for (Player player : players) {
+                        System.out.println(player.getOrder());
+                    }
+                    trick.setTrickCards(new ArrayList<Card>());
+                    trickPanel.removeAll();
+                    trickPanel.revalidate();
+                    trickPanel.repaint();
+
+                    if (players[0].getOrder() == 0) {
+                        cardOne.setEnabled(true);
+                        cardTwo.setEnabled(true);
+                        cardThree.setEnabled(true);
+                        cardFour.setEnabled(true);
+                        cardFive.setEnabled(true);
+                        botPlayButton.setEnabled(false);
+                    } else {
+                        cardOne.setEnabled(false);
+                        cardTwo.setEnabled(false);
+                        cardThree.setEnabled(false);
+                        cardFour.setEnabled(false);
+                        cardFive.setEnabled(false);
+                        botPlayButton.setEnabled(true);
+                    }
+                }
+
+            }
+        });
+
+        botPlayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Card> playableCards = new ArrayList<>();
+                for (Card card : players[playerIndex].getHand()) {
+                    if (!card.isPlayed()) {
+                        playableCards.add(card);
+                    }
+                }
+                Random rand = new Random();
+                int r = rand.nextInt(playableCards.size());
+                Card play = playableCards.get(r);
+                play.setPlayed(true);
+                JButton playedCard = null;
+                try {
+                    playedCard = new JButton(new ImageIcon(ImageIO.read(new File(play.getImgTag()))));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                trickPanel.add(playedCard);
+                trick.addTrickCard(play);
+                trickPanel.revalidate();
+                trickPanel.repaint();
+                content.repaint();
+                playedCard.setVisible(true);
+                if (playerIndex < 3) {
+                    playerIndex++;
+                } else {
+                    playerIndex = 0;
+                }
+                if (players[playerIndex].getOrder() == 0) {
+                    cardOne.setEnabled(true);
+                    cardTwo.setEnabled(true);
+                    cardThree.setEnabled(true);
+                    cardFour.setEnabled(true);
+                    cardFive.setEnabled(true);
+                    botPlayButton.setEnabled(true);
+                    playerIndex = 0;
+                }
+                content.repaint();
+                if (trick.getTrickCards().size() == 4) {
+                    for (Card card : trick.getTrickCards()) {
+                        System.out.println(card.toString());
+                    }
+                    Card winningCard = trick.getHighestCardPlayed(trump);
+                    Player winningPlayer = winningCard.getPlayer();
+                    String winningTeam = winningPlayer.getTeam();
+                    JOptionPane.showMessageDialog(null, "The winner is " + winningTeam + " with "
+                            + winningCard.toString() + " played by Player" + winningPlayer.getOrder());
+                    if (winningTeam.equals("A")) {
+                        teamAScore++;
+                        teamAScoreLabel = new JLabel("Team A Score: " + teamAScore);
+                        teamAScoreLabel.revalidate();
+                        teamAScoreLabel.repaint();
+                    } else {
+                        teamBScore++;
+                        teamBScoreLabel = new JLabel("Team B Score: " + teamBScore);
+                        teamBScoreLabel.revalidate();
+                        teamBScoreLabel.repaint();
+                    }
+
+                    trick.reorderPlayers(winningPlayer.getOrder(), players);
+                    for (Player player : players) {
+                        System.out.println(player.getOrder());
+                    }
+                    trick.setTrickCards(new ArrayList<Card>());
+                    trickPanel.removeAll();
+                    trickPanel.revalidate();
+                    trickPanel.repaint();
+
+                    if (players[0].getOrder() == 0) {
+                        cardOne.setEnabled(true);
+                        cardTwo.setEnabled(true);
+                        cardThree.setEnabled(true);
+                        cardFour.setEnabled(true);
+                        cardFive.setEnabled(true);
+                        botPlayButton.setEnabled(false);
+                    } else {
+                        cardOne.setEnabled(false);
+                        cardTwo.setEnabled(false);
+                        cardThree.setEnabled(false);
+                        cardFour.setEnabled(false);
+                        cardFive.setEnabled(false);
+                        botPlayButton.setEnabled(true);
+                    }
+                }
+            }
+        });
+
+
     }
-//    public void newGame() {
-//        if ()
-//    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Gamer());
-
     }
 
     public void actionPerformed(ActionEvent e) {
 
     }
 
-//    public Card botPlay(Card[] cards) {
-//        for ()
-//    }
 
-    public Card botPlay(Card[] cards, Card highestCard) {
+
+//    public static void main(String[] args) {
+//        Gamer gamer = new Gamer();
+//        Card card = new Card();
+//        card.shuffle(cards, 24);
+//        card.deal(players, cards);
+//        Card[] cards = { new Card("spade", "ace", 1, "ace_of_spades.jpeg", false),
+//                new Card("heart", "ace", 3, "ace_of_hearts.jpeg", false),
+//                new Card("heart", "king", 7, "king_of_hearts.jpeg", false),
+//                new Card("spade", "queen", 9, "queen_of_spades.jpeg", false) };
+//        Card cardPlayed = gamer.botPlay(cards, new Card("spade", "10", 17, "ten_of_spades.jpeg", false), "spades");
+//        System.out.println(card.toString(new Card[]{cardPlayed}));
+//    }
+    public Card botPlay(Card[] cards, Card highestCard, String trump) {
         boolean hasThatSuit;
+        trumpCards = players[playerIndex].getTrump(trump);
         for (Card card : cards) {
             if (card.getSuit().equals(highestCard.getSuit()) && card.getNumber() > highestCard.getNumber()) {
                 trick.addTrickCard(card);
@@ -376,5 +692,29 @@ public class Gamer implements Runnable {
         trick.addTrickCard(lowestCard);
         return lowestCard;
     }
+
+    public void increment() {
+        if (playerIndex < 4) {
+            playerIndex++;
+        } else {
+            playerIndex = 0;
+        }
+    }
+
+    public String getTeam(int playerNumber) {
+        switch (playerNumber) {
+            case 0:
+                return "A";
+            case 1:
+                return "B";
+            case 2:
+                return "A";
+            case 3:
+                return "B";
+        }
+        return null;
+    }
+
+
 
 }

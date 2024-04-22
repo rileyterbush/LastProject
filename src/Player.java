@@ -1,23 +1,41 @@
 import java.sql.Array;
 import java.util.ArrayList;
 
+/**
+ * A class that creates Player objects. There are
+ * four players, and their "order" numbers will
+ * always be 0,1,2,3, where player 0 is the human
+ * player.
+ *
+ * <p>Purdue University -- CS18000 -- Spring 2024</p>
+ *
+ * @author Riley TerBush
+ * @version April 22, 2024
+ */
+
 public class Player {
 
     private String team;
     private int order;
     private Card[] hand;
+    private int position;
     private String trump;
     private Trick trick;
     private ArrayList<Card> trumpCards;
 
-    private Player[] players;
-//    private Player[] players = { new Player("A", 0, null), new Player("B", 1, null),
-//            new Player("A", 2, null), new Player("B", 3, null) };
+//    private Player[] players;
+    private static Player[] players = { new Player("A", 0, null, 0), new Player("B", 1, null, 1),
+            new Player("A", 2, null, 2), new Player("B", 3, null, 3) };
 
-    public Player(String team, int order, Card[] hand) {
+    public Player(String team, int order, Card[] hand, int position) {
         this.team = team;
         this.order = order;
         this.hand = null;
+        this.position = position;
+    }
+
+    public Player() {
+
     }
 
     public String getTeam() {
@@ -32,6 +50,10 @@ public class Player {
         return hand;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
     public void setTeam(String team) {
         this.team = team;
     }
@@ -42,6 +64,10 @@ public class Player {
 
     public void setHand(Card[] hand) {
         this.hand = hand;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public void reorderPlayers(int winner) {
@@ -58,17 +84,17 @@ public class Player {
             case 2:
                 Player temp2 = players[0];
                 Player temp3 = players[1];
-                players[0] = players[3];
-                players[1] = players[4];
+                players[0] = players[2];
+                players[1] = players[3];
                 players[2] = temp2;
                 players[3] = temp3;
                 break;
             case 3:
                 Player temp4 = players[3];
-                players[1] = players[0];
-                players[2] = players[1];
                 players[3] = players[2];
-                players[3] = temp4;
+                players[2] = players[1];
+                players[1] = players[0];
+                players[0] = temp4;
                 break;
         }
     }
@@ -82,16 +108,16 @@ public class Player {
 //        }
 //    }
 
-    public boolean followSuit() {
+    public boolean followSuit(String suit) {
         for (Card card : this.getHand()) {
-            if (card.getSuit().equals(trump)) {
+            if (card.getSuit().equals(suit)) {
                 return true;
             }
         }
         return false;
     }
 
-    public ArrayList<Card> getTrump() {
+    public ArrayList<Card> getTrump(String trump) {
         ArrayList<Card> trumpList = new ArrayList<>();
         for (Card card : hand) {
             if (card.getSuit().equals(trump)) {
@@ -108,6 +134,14 @@ public class Player {
             }
         }
         return false;
+    }
+
+//    public int getCurrentPlayer() {
+//        return
+//    }
+
+    public void playerIncrement() {
+
     }
 
 //    public Card botPlay(Card[] cards, Card highestCard) {
@@ -150,8 +184,12 @@ public class Player {
 
 
 
-//    public static void main(String[] args) {
-//        Player player = new Player();
-//        players.reorderPlayers()
-//    }
+    public static void main(String[] args) {
+        Player player = new Player();
+
+        player.reorderPlayers(0);
+        for (Player player1 : players) {
+            System.out.println(player1.getPosition());
+        }
+    }
 }
